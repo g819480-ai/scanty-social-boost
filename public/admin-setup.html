@@ -94,62 +94,67 @@
     <div id="message" role="status"></div>
   </main>
 
-  <script>
-    const form = document.getElementById("setupForm");
-    const button = document.getElementById("submitButton");
-    const message = document.getElementById("message");
+  
+<script>
+  const form = document.getElementById("setupForm");
+  const button = document.getElementById("submitButton");
+  const message = document.getElementById("message");
 
-    form.addEventListener("submit", async (event) => {
-      event.preventDefault();
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
 
-      message.className = "";
-      message.style.display = "none";
-      button.disabled = true;
-      button.textContent = "Creating account...";
+    message.className = "";
+    message.style.display = "none";
+    button.disabled = true;
+    button.textContent = "Creating account...";
 
-      const name = document.getElementById("name").value.trim();
-      const email = document.getElementById("email").value.trim();
-      const password = document.getElementById("password").value;
-      const setupKey = document.getElementById("setupKey").value;
+    const name = document.getElementById("name").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
+    const setupKey = document.getElementById("setupKey").value;
+
+    try {
+      const response = await fetch("/api/admin/setup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-setup-key": setupKey
+        },
+        body: JSON.stringify({ name, email, password })
+      });
+
+      const raw = await response.text();
+      let result = {};
 
       try {
-        const response = await fetch("/api/admin/setup", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "x-setup-key": setupKey
-          },
-          body: JSON.stringify({ name, email, password })
-        });
+        result = JSON.parse(raw);
+      } catch {
+        result = {};
+      }
 
-        
-const raw = await response.text();
-let result = {};
+      if (!response.ok) {
+        throw new Error(
+          result.error ||
+          result.message ||
+          `Server error (${response.status}): ${raw.slice(0, 300) || "Empty response"}`
+        );
+      }
 
-try {
-  result = JSON.parse(raw);
-} catch {
-  result = {};
-}
+      message.textContent =
+        "Administrator created successfully. Go to the main website and sign in.";
+      message.className = "success";
+      form.reset();
 
-if (!response.ok) {
-  throw new Error(
-    result.error ||
-    result.message ||
-    `Server error (${response.status}): ${raw.slice(0, 300) || "Empty response"}`
-  );
-}
+    } catch (error) {
+      message.textContent =
+        error.message || "Could not connect to the server.";
+      message.className = "error";
 
-message.textContent =
-  "Administrator created successfully. Go to the main website and sign in.";
-message.className = "success";
-form.reset();
-
-} catch (error) {
-  message.textContent = error.message || "Could not connect to the server.";
-  message.className = "error";
-}
-
-  </script>
+    } finally {
+      button.disabled = false;
+      button.textContent = "Create Administrator";
+    }
+  });
+</script>
 </body>
 </html>
