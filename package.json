@@ -1,0 +1,15 @@
+{
+  "name": "scanty-social-boost",
+  "version": "1.0.0",
+  "private": true,
+  "description": "SCANTY SOCIAL BOOST Cloudflare Workers and D1 website",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "db:local": "wrangler d1 execute scanty-social-boost --local --file=./schema.sql",
+    "db:remote": "wrangler d1 execute scanty-social-boost --remote --file=./schema.sql"
+  },
+  "devDependencies": {
+    "wrangler": "^4.0.0"
+  }
+}
