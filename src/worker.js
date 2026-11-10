@@ -9,6 +9,23 @@ const encoder = new TextEncoder();
 const COOKIE = "ssb_session";
 const SESSION_SECONDS = 60 * 60 * 24 * 14;
 
+function cookieValue(request, name) {
+  const raw = request.headers.get("Cookie") || "";
+  const item = raw.split(";")
+    .map(v => v.trim())
+    .find(v => v.startsWith(name + "="));
+
+  return item ? decodeURIComponent(item.slice(name.length + 1)) : null;
+}
+
+function setCookie(token) {
+  return `${COOKIE}=${encodeURIComponent(token)}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=${SESSION_SECONDS}`;
+}
+
+function clearCookie() {
+  return `${COOKIE}=; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=0`;
+}
+
 async function sha256(value) {
   const digest = await crypto.subtle.digest("SHA-256", encoder.encode(value));
   return [...new Uint8Array(digest)].map(b => b.toString(16).padStart(2, "0")).join("");
