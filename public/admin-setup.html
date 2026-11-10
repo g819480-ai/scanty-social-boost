@@ -122,24 +122,34 @@
           body: JSON.stringify({ name, email, password })
         });
 
-        const result = await response.json();
+        
+const raw = await response.text();
+let result = {};
 
-        if (!response.ok) {
-          throw new Error(result.error || result.message || "Administrator setup failed.");
-        }
+try {
+  result = JSON.parse(raw);
+} catch {
+  result = {};
+}
 
-        message.textContent =
-          "Administrator created successfully. Go to the main website and sign in.";
-        message.className = "success";
-        form.reset();
-      } catch (error) {
-        message.textContent = error.message || "Could not connect to the server.";
-        message.className = "error";
-      } finally {
-        button.disabled = false;
-        button.textContent = "Create Administrator";
-      }
-    });
+if (!response.ok) {
+  throw new Error(
+    result.error ||
+    result.message ||
+    `Server error (${response.status}): ${raw.slice(0, 300) || "Empty response"}`
+  );
+}
+
+message.textContent =
+  "Administrator created successfully. Go to the main website and sign in.";
+message.className = "success";
+form.reset();
+
+} catch (error) {
+  message.textContent = error.message || "Could not connect to the server.";
+  message.className = "error";
+}
+
   </script>
 </body>
 </html>
