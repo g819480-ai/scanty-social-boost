@@ -14,22 +14,32 @@ async function sha256(value) {
   return [...new Uint8Array(digest)].map(b => b.toString(16).padStart(2, "0")).join("");
 }
 
+
 async function passwordHash(password, salt) {
-  const key = await crypto.subtle.importKey("raw", encoder.encode(password), "PBKDF2", false, ["deriveBits"]);
+  const key = await crypto.subtle.importKey(
+    "raw",
+    encoder.encode(password),
+    "PBKDF2",
+    false,
+    ["deriveBits"]
+  );
+
   const bits = await crypto.subtle.deriveBits(
-    { name: "PBKDF2", salt: encoder.encode(salt), iterations: 100000, hash: "SHA-256" },
-function cookieValue(request, name) {
-  const raw = request.headers.get("Cookie") || "";
-  const item = raw.split(";").map(v => v.trim()).find(v => v.startsWith(name + "="));
-  return item ? decodeURIComponent(item.slice(name.length + 1)) : null;
+    {
+      name: "PBKDF2",
+      salt: encoder.encode(salt),
+      iterations: 100000,
+      hash: "SHA-256"
+    },
+    key,
+    256
+  );
+
+  return [...new Uint8Array(bits)]
+    .map(b => b.toString(16).padStart(2, "0"))
+    .join("");
 }
 
-function setCookie(token) {
-  return `${COOKIE}=${encodeURIComponent(token)}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=${SESSION_SECONDS}`;
-}
-function clearCookie() {
-  return `${COOKIE}=; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=0`;
-}
 
 async function currentUser(request, env) {
   const token = cookieValue(request, COOKIE);
