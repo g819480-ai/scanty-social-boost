@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS services (
   category TEXT NOT NULL,
   description TEXT NOT NULL,
   price_ghs INTEGER NOT NULL CHECK(price_ghs >= 0),
-  delivery_note TEXT NOT NULL DEFAULT 'We'll contact you to confirm the project brief.',
+  delivery_note TEXT NOT NULL DEFAULT 'We will contact you to confirm the project brief.',
   active INTEGER NOT NULL DEFAULT 1,
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
