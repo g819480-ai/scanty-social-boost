@@ -334,10 +334,18 @@ export default {
     if (!url.pathname.startsWith("/api/")) return env.ASSETS.fetch(request);
     try {
       return await handleApi(request, env, url);
-    } catch (error) {
-      console.error("API error:", error.message);
-      return json({ error: error instanceof HttpError ? error.message : "Something went wrong. Please try again." },
-        error instanceof HttpError ? error.status : 500);
-    }
-  }
-};
+    
+} catch (error) {
+  console.error("API error:", error?.stack || error?.message || error);
+
+  const message = error instanceof HttpError
+    ? error.message
+    : url.pathname === "/api/admin/setup"
+      ? (error?.message || "Unknown administrator setup error")
+      : "Something went wrong. Please try again.";
+
+  return json(
+    { error: message },
+    error instanceof HttpError ? error.status : 500
+  );
+}
