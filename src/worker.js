@@ -272,8 +272,11 @@ async function handleApi(request, env, url) {
     if (!name || !validEmail(email) || password.length < 14) {
       throw new HttpError(400, "Provide a name, valid email and admin password of at least 14 characters.");
     }
-    const exists = await env.DB.prepare("SELECT id FROM users WHERE email=?").bind(email).first();
-    if (exists) throw new HttpError(409, "That email already has an account.");
+    const adminExists = await env.DB.prepare("SELECT id FROM users WHERE role='admin' LIMIT 1").first();
+if (adminExists) throw new HttpError(409, "Administrator setup has already been completed.");
+
+const exists = await env.DB.prepare("SELECT id FROM users WHERE email=?").bind(email).first();
+if (exists) throw new HttpError(409, "That email already has an account.");
     const salt = uid(), hash = await passwordHash(password, salt), id = uid();
     await env.DB.prepare("INSERT INTO users(id,name,email,password_hash,password_salt,role) VALUES(?,?,?,?,?,'admin')")
       .bind(id, name, email, hash, salt).run();
