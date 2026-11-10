@@ -349,3 +349,5 @@ export default {
     error instanceof HttpError ? error.status : 500
   );
 }
+  },
+};
