@@ -10,7 +10,7 @@ run_worker_first = ["/api/*"]
 [[d1_databases]]
 binding = "DB"
 database_name = "scanty-social-boost"
-database_id = "REPLACE_WITH_D1_DATABASE_ID"
+database_id = "1be0cf80-9459-4f4b-a6fa-9aae85291511"
 
 [vars]
 SITE_NAME = "SCANTY SOCIAL BOOST"
